@@ -1,0 +1,440 @@
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">AddCSLuaFile</font></b><font color="#990000">(</font><font color="#FF0000">"autorun/sh_hedgetransfer_config.lua"</font><font color="#990000">)</font>
+
+<i><font color="#9A1900">-- Function to create the frame of the menu</font></i>
+
+<b><font color="#0000FF">function</font></b> <b><font color="#000000">hedgeOpenMenu</font></b><font color="#990000">()</font>
+
+    <i><font color="#9A1900">-- If no players online don't open menu</font></i>
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>player<font color="#990000">.</font><b><font color="#000000">GetCount</font></b><font color="#990000">()</font> <font color="#990000">==</font> <font color="#993399">1</font><font color="#990000">)</font> <b><font color="#0000FF">then</font></b>
+
+        chat<font color="#990000">.</font><b><font color="#000000">AddText</font></b><font color="#990000">(</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">"| "</font><font color="#990000">,</font> HT_ACCENT2<font color="#990000">,</font> <font color="#FF0000">"Hedges Transfer: "</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">"No online players to transfer with :("</font><font color="#990000">)</font>
+
+        <b><font color="#000000">MsgC</font></b><font color="#990000">(</font><font color="#FF0000">"Hedges Transfer Addon | "</font><font color="#990000">,</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">82</font><font color="#990000">,</font> <font color="#993399">82</font><font color="#990000">),</font> <font color="#FF0000">"Was this a bug? If so report it here!"</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">" discord.gg/PQGspxpfFe\n"</font><font color="#990000">)</font>
+
+    <b><font color="#0000FF">return</font></b> <b><font color="#0000FF">end</font></b>
+
+    <b><font color="#0000FF">local</font></b> Frame <font color="#990000">=</font> vgui<font color="#990000">.</font><b><font color="#000000">Create</font></b><font color="#990000">(</font> <font color="#FF0000">"DFrame"</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">Frame:SetBackgroundBlur</font></b><font color="#990000">(</font> HT_MENU_BG_BLUR <font color="#990000">)</font>
+
+        <b><font color="#000000">Frame:SetSize</font></b><font color="#990000">(</font> <b><font color="#000000">ScrW</font></b><font color="#990000">()</font> <font color="#990000">*</font> <font color="#993399">800</font><font color="#990000">/</font><font color="#993399">1920</font><font color="#990000">,</font> <b><font color="#000000">ScrH</font></b><font color="#990000">()</font> <font color="#990000">*</font> <font color="#993399">400</font><font color="#990000">/</font><font color="#993399">1080</font> <font color="#990000">)</font> <i><font color="#9A1900">-- Scaling</font></i>
+
+        <b><font color="#000000">Frame:SetTitle</font></b><font color="#990000">(</font> HT_MENU_TITLE <font color="#990000">)</font>
+
+        <b><font color="#000000">Frame:SetVisible</font></b><font color="#990000">(</font> <b><font color="#0000FF">true</font></b> <font color="#990000">)</font>
+
+        <b><font color="#000000">Frame:Center</font></b><font color="#990000">()</font>
+
+        <b><font color="#000000">Frame:SetDraggable</font></b><font color="#990000">(</font> <b><font color="#0000FF">true</font></b> <font color="#990000">)</font>
+
+        <b><font color="#000000">Frame:ShowCloseButton</font></b><font color="#990000">(</font> <b><font color="#0000FF">true</font></b> <font color="#990000">)</font>
+
+        <b><font color="#000000">Frame:MakePopup</font></b><font color="#990000">()</font>
+
+        Frame<font color="#990000">.</font>Paint <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>s<font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">)</font> <i><font color="#9A1900">-- 'function Frame:Paint( w, h )' works too</font></i>
+            draw<font color="#990000">.</font><b><font color="#000000">RoundedBox</font></b><font color="#990000">(</font><font color="#993399">10</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">,</font> HT_MENU_COLOR<font color="#990000">)</font> <i><font color="#9A1900">-- Draw a red box instead of the frame</font></i>
+        <b><font color="#0000FF">end</font></b>
+
+    <b><font color="#0000FF">local</font></b> leftPanel <font color="#990000">=</font> <b><font color="#000000">Frame:Add</font></b><font color="#990000">(</font> <font color="#FF0000">"DPanel"</font> <font color="#990000">)</font>
+
+    <b><font color="#0000FF">local</font></b> rightPanel <font color="#990000">=</font> <b><font color="#000000">Frame:Add</font></b><font color="#990000">(</font> <font color="#FF0000">"DPanel"</font> <font color="#990000">)</font>
+        rightPanel<font color="#990000">.</font>Paint <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>self<font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">)</font>
+            draw<font color="#990000">.</font><b><font color="#000000">RoundedBox</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">,</font> HT_DEFAULT_COLOR<font color="#990000">)</font>
+        <b><font color="#0000FF">end</font></b>
+
+<i><font color="#9A1900">-- Add the divider</font></i>
+
+    <b><font color="#0000FF">local</font></b> divider <font color="#990000">=</font> <b><font color="#000000">Frame:Add</font></b><font color="#990000">(</font> <font color="#FF0000">"DHorizontalDivider"</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">divider:Dock</font></b><font color="#990000">(</font> FILL <font color="#990000">)</font>
+
+        <b><font color="#000000">divider:SetLeft</font></b><font color="#990000">(</font> leftPanel <font color="#990000">)</font>
+
+        <b><font color="#000000">divider:SetRight</font></b><font color="#990000">(</font> rightPanel <font color="#990000">)</font>
+
+        <b><font color="#000000">divider:SetDividerWidth</font></b><font color="#990000">(</font> <font color="#993399">4</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">divider:SetLeftMin</font></b><font color="#990000">(</font> <font color="#993399">250</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">divider:SetRightMin</font></b><font color="#990000">(</font> <font color="#993399">540</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">divider:SetLeftWidth</font></b><font color="#990000">(</font> <font color="#993399">150</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">divider:IsDraggable</font></b><font color="#990000">(</font> <b><font color="#0000FF">false</font></b> <font color="#990000">)</font>
+
+        divider<font color="#990000">.</font>Paint <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>self<font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">)</font>
+            draw<font color="#990000">.</font><b><font color="#000000">RoundedBox</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">,</font> HT_ACCENT1<font color="#990000">)</font>
+
+        <b><font color="#0000FF">end</font></b>
+
+    <b><font color="#0000FF">local</font></b> topRightPanel <font color="#990000">=</font> <b><font color="#000000">rightPanel:Add</font></b><font color="#990000">(</font><font color="#FF0000">"DPanel"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">topRightPanel:Dock</font></b><font color="#990000">(</font> TOP <font color="#990000">)</font>
+
+        <b><font color="#000000">topRightPanel:SetSize</font></b><font color="#990000">(</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">40</font> <font color="#990000">)</font>
+
+        topRightPanel<font color="#990000">.</font>Paint <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>self<font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">)</font>
+            draw<font color="#990000">.</font><b><font color="#000000">RoundedBox</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">,</font> HT_ACCENT1<font color="#990000">)</font>
+
+        <b><font color="#0000FF">end</font></b>
+
+        <i><font color="#9A1900">-- Asking player to select someone to transfer with</font></i>
+
+    <b><font color="#0000FF">local</font></b> welcomeLabel <font color="#990000">=</font> <b><font color="#000000">topRightPanel:Add</font></b><font color="#990000">(</font> <font color="#FF0000">"DLabel"</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">welcomeLabel:SetText</font></b><font color="#990000">(</font><font color="#FF0000">"Please Select A Player!"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">welcomeLabel:SetFont</font></b><font color="#990000">(</font><font color="#FF0000">"HT_BUTTON_FONT"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">welcomeLabel:Dock</font></b><font color="#990000">(</font> FILL <font color="#990000">)</font>
+
+        <b><font color="#000000">welcomeLabel:DockMargin</font></b><font color="#990000">(</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">13</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">)</font>
+
+        <b><font color="#000000">welcomeLabel:SizeToContents</font></b><font color="#990000">()</font> <i><font color="#9A1900">-- Fixes text</font></i>
+
+        <b><font color="#000000">welcomeLabel:SetContentAlignment</font></b><font color="#990000">(</font> <font color="#993399">8</font> <font color="#990000">)</font> <i><font color="#9A1900">-- Center it to the top center</font></i>
+
+
+    <b><font color="#0000FF">local</font></b> welcomeSteamID <font color="#990000">=</font> <b><font color="#000000">rightPanel:Add</font></b><font color="#990000">(</font> <font color="#FF0000">"DLabel"</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">welcomeSteamID:SetText</font></b><font color="#990000">(</font><font color="#FF0000">"Player SteamID: No Player Selected"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">welcomeSteamID:SetFont</font></b><font color="#990000">(</font><font color="#FF0000">"HT_SMALL_INFO"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">welcomeSteamID:SetContentAlignment</font></b><font color="#990000">(</font><font color="#993399">5</font><font color="#990000">)</font>
+
+        <b><font color="#000000">welcomeSteamID:SizeToContents</font></b><font color="#990000">()</font>
+
+        <b><font color="#000000">welcomeSteamID:Dock</font></b><font color="#990000">(</font>FILL<font color="#990000">)</font>
+
+        <b><font color="#000000">welcomeSteamID:DockMargin</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">300</font><font color="#990000">)</font>
+
+        <b><font color="#000000">welcomeSteamID:SetVisible</font></b><font color="#990000">(</font><b><font color="#0000FF">true</font></b><font color="#990000">)</font>
+
+
+    <b><font color="#0000FF">local</font></b> whatAmount <font color="#990000">=</font> <b><font color="#000000">rightPanel:Add</font></b><font color="#990000">(</font> <font color="#FF0000">"DLabel"</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">whatAmount:SetText</font></b><font color="#990000">(</font><font color="#FF0000">"How much would you like to Send or Request?"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">whatAmount:SetFont</font></b><font color="#990000">(</font><font color="#FF0000">"HT_BIG_INFO"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">whatAmount:SetContentAlignment</font></b><font color="#990000">(</font><font color="#993399">5</font><font color="#990000">)</font>
+
+        <b><font color="#000000">whatAmount:SizeToContents</font></b><font color="#990000">()</font>
+
+        <b><font color="#000000">whatAmount:Dock</font></b><font color="#990000">(</font>FILL<font color="#990000">)</font>
+
+        <b><font color="#000000">whatAmount:DockMargin</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">250</font><font color="#990000">)</font>
+
+        <b><font color="#000000">whatAmount:SetVisible</font></b><font color="#990000">(</font><b><font color="#0000FF">false</font></b><font color="#990000">)</font>
+
+
+<i><font color="#9A1900">-- Set amount you want to transfer</font></i>
+
+    <b><font color="#0000FF">local</font></b> setAmount <font color="#990000">=</font> <b><font color="#000000">rightPanel:Add</font></b><font color="#990000">(</font> <font color="#FF0000">"DNumberWang"</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">setAmount:SetDecimals</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font>
+
+        <b><font color="#000000">setAmount:HideWang</font></b><font color="#990000">()</font>
+
+        <b><font color="#000000">setAmount:SizeToContents</font></b><font color="#990000">()</font>
+
+        <b><font color="#000000">setAmount:SetFont</font></b><font color="#990000">(</font><font color="#FF0000">"HT_BUTTON_FONT"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">setAmount:Dock</font></b><font color="#990000">(</font>FILL<font color="#990000">)</font>
+
+        <i><font color="#9A1900">-- Moving the element</font></i>
+
+        <b><font color="#000000">setAmount:DockMargin</font></b><font color="#990000">(</font><font color="#993399">150</font><font color="#990000">,</font> <font color="#993399">60</font><font color="#990000">,</font> <font color="#993399">140</font><font color="#990000">,</font> <font color="#993399">240</font><font color="#990000">)</font>
+
+        <b><font color="#000000">setAmount:SetVisible</font></b><font color="#990000">(</font><b><font color="#0000FF">false</font></b><font color="#990000">)</font>
+
+        <b><font color="#000000">setAmount:SetContentAlignment</font></b><font color="#990000">(</font><font color="#993399">5</font><font color="#990000">)</font>
+
+        <b><font color="#000000">setAmount:SetMultiline</font></b><font color="#990000">(</font><b><font color="#0000FF">false</font></b><font color="#990000">)</font>
+
+        setAmount<font color="#990000">.</font>Paint <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>self<font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">)</font>
+            draw<font color="#990000">.</font><b><font color="#000000">RoundedBox</font></b><font color="#990000">(</font><font color="#993399">5</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">,</font> HT_ACCENT1<font color="#990000">)</font>
+
+            <b><font color="#000000">setAmount:DrawTextEntryText</font></b><font color="#990000">(</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">),</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">169</font><font color="#990000">,</font> <font color="#993399">169</font><font color="#990000">),</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">249</font><font color="#990000">))</font>
+        <b><font color="#0000FF">end</font></b>
+    <b><font color="#0000FF">local</font></b> sendTransfer <font color="#990000">=</font> <b><font color="#000000">rightPanel:Add</font></b><font color="#990000">(</font> <font color="#FF0000">"DButton"</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">sendTransfer:SetFont</font></b><font color="#990000">(</font><font color="#FF0000">"HT_BUTTON_FONT"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">sendTransfer:SetText</font></b><font color="#990000">(</font><font color="#FF0000">"Send"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">sendTransfer:Dock</font></b><font color="#990000">(</font>FILL<font color="#990000">)</font>
+
+        <b><font color="#000000">sendTransfer:SetVisible</font></b><font color="#990000">(</font><b><font color="#0000FF">false</font></b><font color="#990000">)</font>
+
+        <b><font color="#000000">sendTransfer:DockMargin</font></b><font color="#990000">(</font><font color="#993399">140</font><font color="#990000">,</font> <font color="#993399">120</font><font color="#990000">,</font> <font color="#993399">290</font><font color="#990000">,</font> <font color="#993399">100</font><font color="#990000">)</font>
+
+        sendTransfer<font color="#990000">.</font>Paint <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>self<font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">)</font>
+            draw<font color="#990000">.</font><b><font color="#000000">RoundedBox</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">101</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">132</font><font color="#990000">))</font>
+
+        <b><font color="#0000FF">end</font></b>
+
+    <b><font color="#0000FF">local</font></b> requestTransfer <font color="#990000">=</font> <b><font color="#000000">rightPanel:Add</font></b><font color="#990000">(</font> <font color="#FF0000">"DButton"</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">requestTransfer:SetFont</font></b><font color="#990000">(</font><font color="#FF0000">"HT_BUTTON_FONT"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">requestTransfer:SetText</font></b><font color="#990000">(</font><font color="#FF0000">"Request"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">requestTransfer:Dock</font></b><font color="#990000">(</font>FILL<font color="#990000">)</font>
+
+        <b><font color="#000000">requestTransfer:SetVisible</font></b><font color="#990000">(</font><b><font color="#0000FF">false</font></b><font color="#990000">)</font>
+
+        <b><font color="#000000">requestTransfer:DockMargin</font></b><font color="#990000">(</font><font color="#993399">300</font><font color="#990000">,</font> <font color="#993399">120</font><font color="#990000">,</font> <font color="#993399">130</font><font color="#990000">,</font> <font color="#993399">100</font><font color="#990000">)</font>
+
+        requestTransfer<font color="#990000">.</font>Paint <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>self<font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">)</font>
+            draw<font color="#990000">.</font><b><font color="#000000">RoundedBox</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">,</font> HT_ACCENT2<font color="#990000">)</font>
+
+        <b><font color="#0000FF">end</font></b>
+
+<i><font color="#9A1900">-- Adding the vgui component to scroll</font></i>
+
+    <b><font color="#0000FF">local</font></b> scrollList <font color="#990000">=</font> <b><font color="#000000">leftPanel:Add</font></b><font color="#990000">(</font> <font color="#FF0000">"DScrollPanel"</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">scrollList:Dock</font></b><font color="#990000">(</font> FILL <font color="#990000">)</font>
+
+        scrollList<font color="#990000">.</font>Paint <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>self<font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">)</font>
+
+            draw<font color="#990000">.</font><b><font color="#000000">RoundedBox</font></b><font color="#990000">(</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">,</font> HT_DEFAULT_COLOR <font color="#990000">)</font>
+        <b><font color="#0000FF">end</font></b>
+
+<i><font color="#9A1900">-- Add Support Buttons</font></i>
+
+    <b><font color="#0000FF">local</font></b> discordButton <font color="#990000">=</font> <b><font color="#000000">scrollList:Add</font></b><font color="#990000">(</font><font color="#FF0000">"DButton"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">discordButton:SetText</font></b><font color="#990000">(</font><font color="#FF0000">"Support Discord"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">discordButton:SetFont</font></b><font color="#990000">(</font><font color="#FF0000">"HT_BUTTON_FONT"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">discordButton:Dock</font></b><font color="#990000">(</font> TOP <font color="#990000">)</font>
+
+        <b><font color="#000000">discordButton:DockMargin</font></b><font color="#990000">(</font><font color="#993399">30</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">30</font><font color="#990000">,</font> <font color="#993399">5</font><font color="#990000">)</font>
+
+        discordButton<font color="#990000">.</font>DoClick <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">()</font>
+
+            <b><font color="#000000">MsgC</font></b><font color="#990000">(</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">"\nJoin the discord here! discord.gg/PQGspxpfFe\n"</font><font color="#990000">)</font>
+
+            chat<font color="#990000">.</font><b><font color="#000000">AddText</font></b><font color="#990000">(</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">"\nJoin the discord here! discord.gg/PQGspxpfFe\n"</font><font color="#990000">)</font>
+
+            <i><font color="#9A1900">-- gui.OpenURL('</font></i><u><font color="#0000FF">https://discord.gg/KfCzCA78ph</font></u><i><font color="#9A1900">') -- TODO: CURRENT BUG ([MENU ERROR] attempt to call a nil value)</font></i>
+        <b><font color="#0000FF">end</font></b>
+
+        discordButton<font color="#990000">.</font>Paint <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>self<font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">)</font>
+            draw<font color="#990000">.</font><b><font color="#000000">RoundedBox</font></b><font color="#990000">(</font><font color="#993399">10</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">,</font> HT_ACCENT1<font color="#990000">)</font>
+
+        <b><font color="#0000FF">end</font></b>
+
+    <b><font color="#0000FF">local</font></b> creditsButton <font color="#990000">=</font> <b><font color="#000000">scrollList:Add</font></b><font color="#990000">(</font><font color="#FF0000">"DButton"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">creditsButton:SetText</font></b><font color="#990000">(</font><font color="#FF0000">"Addon Credits!"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">creditsButton:SetFont</font></b><font color="#990000">(</font><font color="#FF0000">"HT_BUTTON_FONT"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">creditsButton:Dock</font></b><font color="#990000">(</font> TOP <font color="#990000">)</font>
+
+        <b><font color="#000000">creditsButton:DockMargin</font></b><font color="#990000">(</font><font color="#993399">30</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">30</font><font color="#990000">,</font> <font color="#993399">8</font><font color="#990000">)</font>
+
+        creditsButton<font color="#990000">.</font>Paint <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>self<font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">)</font>
+            draw<font color="#990000">.</font><b><font color="#000000">RoundedBox</font></b><font color="#990000">(</font><font color="#993399">10</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">,</font> HT_ACCENT1<font color="#990000">)</font>
+
+        <b><font color="#0000FF">end</font></b>
+
+        creditsButton<font color="#990000">.</font>DoClick <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">()</font>
+
+            <b><font color="#000000">print</font></b><font color="#990000">(</font><font color="#FF0000">"\n\n\n\n\n"</font><font color="#990000">)</font>
+            <b><font color="#000000">LocalPlayer</font></b><font color="#990000">():</font><b><font color="#000000">ConCommand</font></b><font color="#990000">(</font><font color="#FF0000">"showconsole"</font><font color="#990000">)</font>
+            <b><font color="#000000">MsgC</font></b><font color="#990000">(</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">"Hedges Transfer Addon Credits!\n\n"</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">216</font><font color="#990000">,</font> <font color="#993399">147</font><font color="#990000">,</font> <font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">"Main Developer: Hedges\n"</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font> <font color="#993399">252</font><font color="#990000">,</font> <font color="#993399">164</font><font color="#990000">),</font> <font color="#FF0000">"Steam Link: https://steamcommunity.com/id/Hedgess/\nDiscord Link: discord.gg/PQGspxpfFe\n"</font><font color="#990000">)</font>
+        <b><font color="#0000FF">end</font></b>
+
+<i><font color="#9A1900">-- Get all players and sort through to make buttons</font></i>
+
+    <b><font color="#0000FF">local</font></b> players <font color="#990000">=</font> player<font color="#990000">.</font><b><font color="#000000">GetAll</font></b><font color="#990000">()</font>
+
+    <b><font color="#0000FF">for</font></b> k<font color="#990000">,</font>v <b><font color="#0000FF">in</font></b> <b><font color="#000000">ipairs</font></b><font color="#990000">(</font>players<font color="#990000">)</font> <b><font color="#0000FF">do</font></b>
+
+        <i><font color="#9A1900">-- Don't include client</font></i>
+
+        <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>v <font color="#990000">==</font> <b><font color="#000000">LocalPlayer</font></b><font color="#990000">())</font> <b><font color="#0000FF">then</font></b> continue <b><font color="#0000FF">end</font></b>
+
+        <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>v <font color="#990000">==</font> <b><font color="#000000">IsValid</font></b><font color="#990000">())</font> <b><font color="#0000FF">then</font></b> continue <b><font color="#0000FF">end</font></b>
+
+        <b><font color="#0000FF">local</font></b> buttons <font color="#990000">=</font> <b><font color="#000000">scrollList:Add</font></b><font color="#990000">(</font> <font color="#FF0000">"DButton"</font> <font color="#990000">)</font>
+
+        <b><font color="#000000">buttons:SetText</font></b><font color="#990000">(</font> <b><font color="#000000">v:Nick</font></b><font color="#990000">()</font> <font color="#990000">)</font> <i><font color="#9A1900">-- Setting all button names to that players Nick</font></i>
+
+        <b><font color="#000000">buttons:SetFont</font></b><font color="#990000">(</font><font color="#FF0000">"HT_BUTTON_FONT"</font><font color="#990000">)</font>
+
+        <b><font color="#000000">buttons:Dock</font></b><font color="#990000">(</font> TOP <font color="#990000">)</font>
+
+        <b><font color="#000000">buttons:DockMargin</font></b><font color="#990000">(</font> <font color="#993399">20</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">20</font><font color="#990000">,</font> <font color="#993399">4</font><font color="#990000">)</font>
+
+        buttons<font color="#990000">.</font>Paint <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>self<font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">)</font>
+            draw<font color="#990000">.</font><b><font color="#000000">RoundedBox</font></b><font color="#990000">(</font><font color="#993399">8</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">,</font> w<font color="#990000">,</font> h<font color="#990000">,</font> HT_ACCENT2<font color="#990000">)</font>
+
+        <b><font color="#0000FF">end</font></b>
+
+        <i><font color="#9A1900">-- Handles when the player clicks a button to select a player</font></i>
+
+        buttons<font color="#990000">.</font>DoClick <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">()</font>
+
+            <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font><b><font color="#000000">v:IsValid</font></b><font color="#990000">())</font> <b><font color="#0000FF">then</font></b> <b><font color="#000000">print</font></b><font color="#990000">(</font><font color="#FF0000">"That is not a valid player!"</font><font color="#990000">)</font> <b><font color="#0000FF">return</font></b> <b><font color="#0000FF">end</font></b>
+
+            <b><font color="#000000">welcomeLabel:SetText</font></b><font color="#990000">(</font><font color="#FF0000">"Selected Player: "</font><font color="#990000">..</font> <b><font color="#000000">v:Nick</font></b><font color="#990000">())</font>
+
+            <b><font color="#000000">whatAmount:SetVisible</font></b><font color="#990000">(</font><b><font color="#0000FF">true</font></b><font color="#990000">)</font>
+
+            <b><font color="#000000">setAmount:SetVisible</font></b><font color="#990000">(</font><b><font color="#0000FF">true</font></b><font color="#990000">)</font>
+
+            <b><font color="#000000">sendTransfer:SetVisible</font></b><font color="#990000">(</font><b><font color="#0000FF">true</font></b><font color="#990000">)</font>
+
+            <b><font color="#000000">requestTransfer:SetVisible</font></b><font color="#990000">(</font><b><font color="#0000FF">true</font></b><font color="#990000">)</font>
+
+            <b><font color="#000000">welcomeSteamID:SetText</font></b><font color="#990000">(</font><font color="#FF0000">"Player SteamID: "</font><font color="#990000">..</font> <b><font color="#000000">v:SteamID</font></b><font color="#990000">())</font>
+
+            <i><font color="#9A1900">-- Handle when a player clicks the send button</font></i>
+
+            sendTransfer<font color="#990000">.</font>DoClick <font color="#990000">=</font> <b><font color="#0000FF">function</font></b> <font color="#990000">()</font>
+
+                <i><font color="#9A1900">-- Prevent players from sending empty transfers or exploiting negative numbers</font></i>
+
+                <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><b><font color="#000000">setAmount:GetValue</font></b><font color="#990000">()</font> <font color="#990000">&lt;=</font> <font color="#993399">0</font><font color="#990000">)</font> <b><font color="#0000FF">then</font></b>
+
+                    chat<font color="#990000">.</font><b><font color="#000000">AddText</font></b><font color="#990000">(</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">121</font><font color="#990000">,</font><font color="#993399">121</font><font color="#990000">),</font> <font color="#FF0000">"HTA: "</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">169</font><font color="#990000">,</font><font color="#993399">43</font><font color="#990000">,</font><font color="#993399">43</font><font color="#990000">),</font> <font color="#FF0000">"Value must be greater than 0"</font><font color="#990000">)</font>
+                    <b><font color="#0000FF">return</font></b>
+                <b><font color="#0000FF">end</font></b>
+
+                <i><font color="#9A1900">-- Begin communication with the server</font></i>
+
+                net<font color="#990000">.</font><b><font color="#000000">Start</font></b><font color="#990000">(</font><font color="#FF0000">"hta_send"</font><font color="#990000">)</font>
+
+                <i><font color="#9A1900">-- Send selected player</font></i>
+
+                net<font color="#990000">.</font><b><font color="#000000">WriteEntity</font></b><font color="#990000">(</font>v<font color="#990000">)</font>
+
+                <i><font color="#9A1900">-- Send amount to transfer</font></i>
+
+                net<font color="#990000">.</font><b><font color="#000000">WriteUInt</font></b><font color="#990000">(</font><b><font color="#000000">setAmount:GetValue</font></b><font color="#990000">(),</font> <font color="#993399">32</font><font color="#990000">)</font>
+
+                <i><font color="#9A1900">-- Send all data to the server</font></i>
+
+                net<font color="#990000">.</font><b><font color="#000000">SendToServer</font></b><font color="#990000">()</font>
+            <b><font color="#0000FF">end</font></b>
+
+            requestTransfer<font color="#990000">.</font>DoClick <font color="#990000">=</font> <b><font color="#0000FF">function</font></b> <font color="#990000">()</font> chat<font color="#990000">.</font><b><font color="#000000">AddText</font></b><font color="#990000">(</font><font color="#FF0000">"The request feature is a work in progress. Please join the discord for updates!"</font><font color="#990000">)</font> <b><font color="#0000FF">return</font></b> <b><font color="#0000FF">false</font></b> <b><font color="#0000FF">end</font></b>
+
+            <i><font color="#9A1900">-- TODO: GET THIS WORKING!</font></i>
+
+            <i><font color="#9A1900">-- Handle when the player clicks the request button</font></i>
+            <i><font color="#9A1900">-- requestTransfer.DoClick = function ()</font></i>
+
+            <i><font color="#9A1900">--     -- Prevent players from sending empty requests or exploiting negative numbers</font></i>
+            <i><font color="#9A1900">--     if (setAmount:GetValue() &lt;= 0) then</font></i>
+            <i><font color="#9A1900">--         chat.AddText(Color(255,121,121), "HTA: ", Color(169,43,43), "Value must be greater than 0")</font></i>
+            <i><font color="#9A1900">--         return</font></i>
+            <i><font color="#9A1900">--     end</font></i>
+
+            <i><font color="#9A1900">--     -- Begin communication with the server</font></i>
+            <i><font color="#9A1900">--     net.Start("hta_request")</font></i>
+            <i><font color="#9A1900">--     -- Send selected player</font></i>
+            <i><font color="#9A1900">--     net.WriteEntity(v)</font></i>
+            <i><font color="#9A1900">--     -- Send amount to request</font></i>
+            <i><font color="#9A1900">--     net.WriteUInt(setAmount:GetValue(), 32)</font></i>
+            <i><font color="#9A1900">--     -- Send all data to the server</font></i>
+            <i><font color="#9A1900">--     net.SendToServer()</font></i>
+            <i><font color="#9A1900">-- end</font></i>
+        <b><font color="#0000FF">end</font></b>
+        <i><font color="#9A1900">-- Letting sending player know the transfer was successful</font></i>
+
+    net<font color="#990000">.</font><b><font color="#000000">Receive</font></b><font color="#990000">(</font><font color="#FF0000">"hta_send_success"</font><font color="#990000">,</font> <b><font color="#0000FF">function</font></b> <font color="#990000">(</font>len<font color="#990000">)</font>
+
+        <b><font color="#0000FF">local</font></b> amount <font color="#990000">=</font> net<font color="#990000">.</font><b><font color="#000000">ReadUInt</font></b><font color="#990000">(</font><font color="#993399">32</font><font color="#990000">)</font>
+
+        chat<font color="#990000">.</font><b><font color="#000000">AddText</font></b><font color="#990000">(</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">114</font><font color="#990000">,</font><font color="#993399">114</font><font color="#990000">),</font> <font color="#FF0000">"HTA:"</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">" Your transfer of "</font><font color="#990000">..</font> amount <font color="#990000">..</font> <font color="#FF0000">"$ to "</font><font color="#990000">..</font> <b><font color="#000000">v:Nick</font></b><font color="#990000">()</font> <font color="#990000">..</font> <font color="#FF0000">" was "</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">8</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">41</font><font color="#990000">),</font> <font color="#FF0000">"successful!"</font><font color="#990000">)</font>
+
+    <b><font color="#0000FF">end</font></b><font color="#990000">)</font>
+
+    <i><font color="#9A1900">-- Letting receiving player know the transfer was successful</font></i>
+
+    net<font color="#990000">.</font><b><font color="#000000">Receive</font></b><font color="#990000">(</font><font color="#FF0000">"hta_received"</font><font color="#990000">,</font> <b><font color="#0000FF">function</font></b> <font color="#990000">(</font>len<font color="#990000">)</font>
+
+        <b><font color="#0000FF">local</font></b> amount <font color="#990000">=</font> net<font color="#990000">.</font><b><font color="#000000">ReadUInt</font></b><font color="#990000">(</font><font color="#993399">32</font><font color="#990000">)</font>
+
+        <b><font color="#0000FF">local</font></b> sendingPlayer <font color="#990000">=</font> net<font color="#990000">.</font><b><font color="#000000">ReadEntity</font></b><font color="#990000">()</font>
+
+        chat<font color="#990000">.</font><b><font color="#000000">AddText</font></b><font color="#990000">(</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">114</font><font color="#990000">,</font><font color="#993399">114</font><font color="#990000">),</font> <font color="#FF0000">"HTA:"</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">" A transfer of "</font><font color="#990000">..</font> amount <font color="#990000">..</font> <font color="#FF0000">"$ from "</font><font color="#990000">..</font> <b><font color="#000000">sendingPlayer:Nick</font></b><font color="#990000">()</font> <font color="#990000">..</font> <font color="#FF0000">" was "</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">8</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">41</font><font color="#990000">),</font> <font color="#FF0000">"successful!"</font><font color="#990000">)</font>
+    <b><font color="#0000FF">end</font></b><font color="#990000">)</font>
+
+    <i><font color="#9A1900">-- Letting player know they cannot afford this transaction :(</font></i>
+
+    net<font color="#990000">.</font><b><font color="#000000">Receive</font></b><font color="#990000">(</font><font color="#FF0000">"hta_cantafford"</font><font color="#990000">,</font> <b><font color="#0000FF">function</font></b> <font color="#990000">(</font>len<font color="#990000">)</font>
+
+        chat<font color="#990000">.</font><b><font color="#000000">AddText</font></b><font color="#990000">(</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">114</font><font color="#990000">,</font><font color="#993399">114</font><font color="#990000">),</font> <font color="#FF0000">"HTA:"</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">" You cannot afford this transfer!"</font><font color="#990000">)</font>
+    <b><font color="#0000FF">end</font></b><font color="#990000">)</font>
+
+        <i><font color="#9A1900">-- Letting player know the person they requested from cannot afford this request :(</font></i>
+
+            net<font color="#990000">.</font><b><font color="#000000">Receive</font></b><font color="#990000">(</font><font color="#FF0000">"hta_reqcantafford"</font><font color="#990000">,</font> <b><font color="#0000FF">function</font></b> <font color="#990000">(</font>len<font color="#990000">)</font>
+                chat<font color="#990000">.</font><b><font color="#000000">AddText</font></b><font color="#990000">(</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">114</font><font color="#990000">,</font><font color="#993399">114</font><font color="#990000">),</font> <font color="#FF0000">"HTA:"</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">" The player you are requesting from cannot afford this transfer!"</font><font color="#990000">)</font>
+            <b><font color="#0000FF">end</font></b><font color="#990000">)</font>
+
+    <i><font color="#9A1900">-- Cooldown alert</font></i>
+
+    net<font color="#990000">.</font><b><font color="#000000">Receive</font></b><font color="#990000">(</font><font color="#FF0000">"hta_waitcooldown"</font><font color="#990000">,</font> <b><font color="#0000FF">function</font></b> <font color="#990000">(</font>len<font color="#990000">)</font>
+
+        chat<font color="#990000">.</font><b><font color="#000000">AddText</font></b><font color="#990000">(</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">114</font><font color="#990000">,</font><font color="#993399">114</font><font color="#990000">),</font> <font color="#FF0000">"HTA:"</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">" You must wait 10 seconds before trying to send another transfer."</font><font color="#990000">)</font>
+    <b><font color="#0000FF">end</font></b><font color="#990000">)</font>
+
+        <i><font color="#9A1900">-- Cooldown alert</font></i>
+
+        net<font color="#990000">.</font><b><font color="#000000">Receive</font></b><font color="#990000">(</font><font color="#FF0000">"hta_request_received"</font><font color="#990000">,</font> <b><font color="#0000FF">function</font></b> <font color="#990000">(</font>len<font color="#990000">)</font>
+
+            <b><font color="#0000FF">local</font></b> targetPlayer <font color="#990000">=</font> net<font color="#990000">.</font><b><font color="#000000">ReadEntity</font></b><font color="#990000">()</font>
+
+            chat<font color="#990000">.</font><b><font color="#000000">AddText</font></b><font color="#990000">(</font><b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">114</font><font color="#990000">,</font><font color="#993399">114</font><font color="#990000">),</font> <font color="#FF0000">"HTA:"</font><font color="#990000">,</font> <b><font color="#000000">Color</font></b><font color="#990000">(</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">,</font><font color="#993399">255</font><font color="#990000">),</font> <font color="#FF0000">" Your request to "</font><font color="#990000">..</font> <b><font color="#000000">targetPlayer:Nick</font></b><font color="#990000">()</font> <font color="#990000">..</font> <font color="#FF0000">" was successful!"</font><font color="#990000">)</font>
+        <b><font color="#0000FF">end</font></b><font color="#990000">)</font>
+    <b><font color="#0000FF">end</font></b>
+<b><font color="#0000FF">end</font></b>
+
+<i><font color="#9A1900">-- Add Chat Commands</font></i>
+
+hook<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"OnPlayerChat"</font><font color="#990000">,</font> <font color="#FF0000">"hedgeChatOpenTransfer"</font><font color="#990000">,</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>ply<font color="#990000">,</font> text<font color="#990000">,</font> teamChat<font color="#990000">,</font> isDead<font color="#990000">)</font> <i><font color="#9A1900">-- TODO: Add check for customization to disable commands while dead?</font></i>
+
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font> ply <font color="#990000">~=</font> <b><font color="#000000">LocalPlayer</font></b><font color="#990000">()</font> <font color="#990000">)</font> <b><font color="#0000FF">then</font></b> <b><font color="#0000FF">return</font></b> <b><font color="#0000FF">end</font></b>
+
+    text <font color="#990000">=</font> string<font color="#990000">.</font><b><font color="#000000">lower</font></b><font color="#990000">(</font> text <font color="#990000">)</font>
+
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>text <font color="#990000">==</font> <font color="#FF0000">"/transfer"</font><font color="#990000">)</font> <b><font color="#0000FF">then</font></b>
+
+        <b><font color="#000000">hedgeOpenMenu</font></b><font color="#990000">()</font>
+
+        <b><font color="#0000FF">return</font></b> <b><font color="#0000FF">true</font></b>
+    <b><font color="#0000FF">end</font></b>
+
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>text <font color="#990000">==</font> <font color="#FF0000">"!transfer"</font><font color="#990000">)</font> <b><font color="#0000FF">then</font></b>
+
+        <b><font color="#000000">hedgeOpenMenu</font></b><font color="#990000">()</font>
+
+        <b><font color="#0000FF">return</font></b> <b><font color="#0000FF">true</font></b>
+    <b><font color="#0000FF">end</font></b>
+
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>text <font color="#990000">==</font> <font color="#FF0000">"ishtapresent"</font><font color="#990000">)</font> <b><font color="#0000FF">then</font></b>
+
+        chat<font color="#990000">.</font><b><font color="#000000">AddText</font></b><font color="#990000">(</font><font color="#FF0000">"Yes, Hedges has made his mark here!"</font><font color="#990000">)</font>
+
+        <b><font color="#0000FF">return</font></b> <b><font color="#0000FF">true</font></b>
+    <b><font color="#0000FF">end</font></b>
+    
+<b><font color="#0000FF">end</font></b><font color="#990000">)</font>
+
+concommand<font color="#990000">.</font><b><font color="#000000">Add</font></b><font color="#990000">(</font><font color="#FF0000">"transfer"</font><font color="#990000">,</font> hedgeOpenMenu<font color="#990000">)</font> <i><font color="#9A1900">-- Concommand to trigger the menu</font></i>
+
+<i><font color="#9A1900">-- TODO: Figure out the text highlight color on the buttons?</font></i></tt></pre>
