@@ -1,18 +1,10 @@
 AddCSLuaFile("autorun/sh_hedgetransfer_config.lua")
-
 -- TODO: ADD MORE FEEDBACK
-
 -- TODO: ADD SOUNDS
-
 -- TODO: ADD LOCAL PLAYER CHECK | is this player sending or requesting themself?
-
 -- TODO: ADD IS ANYBODY ELSE ONLINE CHECK? ?
-
 -- TODO: ADD LOGS
-
-
 -- Precaching network messages
-
 util.AddNetworkString("hta_send")
 util.AddNetworkString("hta_send_success")
 util.AddNetworkString("hta_received")
@@ -22,150 +14,201 @@ util.AddNetworkString("hta_request")
 util.AddNetworkString("hta_reqcantafford")
 util.AddNetworkString("hta_request_received")
 util.AddNetworkString("hta_receiving_request")
+util.AddNetworkString("hta_request_invalid")
+local TRANSFER = {}
+
+--[[
+
+    Should have the form like:
+      {
+        requestId: [STRING],
+        requester: [STEAMID],
+        amount: [NUMBER],
+        from: [STEAMID]
+      }
+
+]]
+local function fetchTransferOf(reqSteamId, targetSteamId)
+    for k, v in ipairs(TRANSFER) do
+        if v.requester == reqSteamId and v.from == targetSteamId then return k, v end
+    end
+
+    return false
+end
+
+local function getTransferById(id)
+    for k, v in ipairs(TRANSFER) do
+        if v.requestId == id then return k, v end
+    end
+
+    return false
+end
+
+local function checkIfUserRequestedIt(reqSteamId, targetSteamId)
+    local res = fetchTransferOf(reqSteamId, targetSteamId)
+    if res then return true, res end
+
+    return false
+end
+
+local function generateId()
+    local template = "xxxxyx"
+
+    return string.gsub(template, "[xy]", function(c)
+        local v = (c == "x") and math.random(0, 0xf) or math.random(8, 0xb)
+
+        return string.format("%x", v)
+    end)
+end
 
 -- Receive transfer send
-
 -- Cooldown stuff
+local delay = 10
+local lastOccurance = -delay
 
-local delay = 10 local lastOccurance = -delay
-
-net.Receive("hta_send", function (len, sendingPlayer)
-
+net.Receive("hta_send", function(len, sendingPlayer)
     local timeElapsed = CurTime() - lastOccurance
 
-    if (timeElapsed < delay) then
-
+    if timeElapsed < delay then
         net.Start("hta_waitcooldown")
-
         net.Send(sendingPlayer)
 
-    return end
+        return
+    end
 
     lastOccurance = CurTime()
 
     -- Block message if to big
-
-    if (len >= 500) then
-
+    if len >= 500 then
         print("\nNet message to big. Stopping - HTA\n")
 
-    return end
+        return
+    end
 
     -- Receive selected player
-
     local selPlayer = net.ReadEntity()
-
     -- Receive amount to transfer
-
     local amount = net.ReadUInt(32)
 
     -- Blocking values of 0 or lower, due to security concerns.
-
-    if (amount <= 0) then
-
+    if amount <= 0 then
         print(sendingPlayer:Nick() .. " Tried sending a value of 0 or lower - HTA")
+
         return
     end
 
     -- Handle transaction
-
     -- Check if sending player can afford transfer amount
-
-    if (sendingPlayer:canAfford(amount) == false) then
-
+    if sendingPlayer:canAfford(amount) == false then
         net.Start("hta_cantafford")
-
         net.Send(sendingPlayer)
-    return end
+
+        return
+    end
 
     sendingPlayer:addMoney(-amount)
-
     selPlayer:addMoney(amount)
-
     -- Letting Sending Player know that the transfer was successful
-
     net.Start("hta_send_success")
-
     net.WriteUInt(amount, 32)
-
     net.Send(sendingPlayer)
-
     -- Letting receiving player know that the transfer was successful
-
     net.Start("hta_received")
-
     net.WriteUInt(amount, 32)
-
     net.WriteEntity(sendingPlayer)
-
     net.Send(selPlayer)
 end)
 
 -- Receive transfer request
-
-net.Receive("hta_request", function (len, reqPlayer)
-
+net.Receive("hta_request", function(len, reqPlayer)
     local timeElapsed = CurTime() - lastOccurance
 
-    if (timeElapsed < delay) then
-
+    if timeElapsed < delay then
         net.Start("hta_waitcooldown")
-
         net.Send(reqPlayer)
-    return end
+
+        return
+    end
 
     lastOccurance = CurTime()
 
-        -- Block message if to big
+    -- Block message if to big
+    if len >= 500 then
+        print("\nNet message to big. Stopping - HTA\n")
 
-        if (len >= 500) then
-            print("\nNet message to big. Stopping - HTA\n")
-        return end
+        return
+    end
 
     -- Player who is getting the request
-
     local targetPlayer = net.ReadEntity()
 
-    -- Amount being requested
+    if not targetPlayer or not targetPlayer:IsPlayer() then
+        net.Start("hta_request_invalid")
+        net.WriteString("The Player you choosen is either vanished or is disconnected")
+        net.Send(reqPlayer)
+    end
 
+    -- Amount being requested
     local requestAmount = net.ReadUInt(32)
 
-    if (targetPlayer:canAfford(requestAmount) == false) then
-
-        net.Start("hta_reqcantafford")
-
+    if checkIfUserRequestedIt(reqPlayer:SteamID(), targetPlayer:SteamID64()) then
+        net.Start("hta_request_invalid")
+        net.WriteString("You already requested Money from him! Please wait!")
         net.Send(reqPlayer)
-    return end
+    end
 
+    if targetPlayer:canAfford(requestAmount) == false then
+        net.Start("hta_reqcantafford")
+        net.Send(reqPlayer)
+
+        return
+    end
+
+    local request = {
+        requestId = generateId(),
+        requester = reqPlayer:SteamID(),
+        amount = requestAmount,
+        from = targetPlayer:SteamID()
+    }
+
+    -- Adding Request Object
+    table.insert(TRANSFER, request)
     -- Letting requesting player know that the request was received
-
     net.Start("hta_request_received")
-
     net.WriteEntity(targetPlayer)
-
     net.Send(reqPlayer)
 
-
     local function receiveRequestSend()
-
-
-            -- Letting target player know there is a new request
-
+        -- Letting target player know there is a new request
         net.Start("hta_receiving_request")
-
-            -- Sending the amount requested
-
+        -- Sending the amount requested
         net.WriteUInt(requestAmount, 32)
-
-            -- Sending who sent the request
-
+        -- Sending the key for identification
+        net.WriteString(request.requestId)
+        -- Sending who sent the request
         net.WriteEntity(reqPlayer)
-
         net.Send(targetPlayer)
     end
+
     receiveRequestSend()
-
-    -- timer.Create("netcooldown", 1, 1, receiveRequestSend)
-
 end)
+
+local function HandleRequest(request)
+end
+
+-- timer.Create("netcooldown", 1, 1, receiveRequestSend)
 -- TODO: ADD TRANSFER REASON?
+hook.Add("PlayerSay", "hedgeChatServerCommands", function(ply, txt, tc)
+    if string.StartsWith(txt, "/acceptrequest ") then
+        local id = string.sub(txt, 17)
+        local request = getTransferById(id)
+
+        if not request then
+            ply:ChatPrint("HTA: Your Id you provided is invalid!")
+
+            return false
+        end
+
+        HandleRequest(request)
+    end
+end)
