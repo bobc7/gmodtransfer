@@ -212,6 +212,7 @@ local function HandleRequest(request)
         return
     end
 
+    -- Removing Request from the table
     table.remove(TRANSFER, request)
     -- Letting Requester know that the request was accepted
     net.Start("hta_request_accepted")
@@ -236,6 +237,7 @@ local function HandleDecline(request)
         return
     end
 
+    -- Removing Request from the table
     table.remove(TRANSFER, request)
     -- Letting Requester know that the request was declined
     net.Start("hta_request_declined")
