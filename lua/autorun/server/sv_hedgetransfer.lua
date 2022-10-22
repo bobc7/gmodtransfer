@@ -15,6 +15,8 @@ util.AddNetworkString("hta_reqcantafford")
 util.AddNetworkString("hta_request_received")
 util.AddNetworkString("hta_receiving_request")
 util.AddNetworkString("hta_request_invalid")
+util.AddNetworkString("hta_request_accepted")
+util.AddNetworkString("hta_request_declined")
 local TRANSFER = {}
 
 --[[
@@ -177,31 +179,78 @@ net.Receive("hta_request", function(len, reqPlayer)
     net.Start("hta_request_received")
     net.WriteEntity(targetPlayer)
     net.Send(reqPlayer)
-
-    local function receiveRequestSend()
-        -- Letting target player know there is a new request
-        net.Start("hta_receiving_request")
-        -- Sending the amount requested
-        net.WriteUInt(requestAmount, 32)
-        -- Sending the key for identification
-        net.WriteString(request.requestId)
-        -- Sending who sent the request
-        net.WriteEntity(reqPlayer)
-        net.Send(targetPlayer)
-    end
-
-    receiveRequestSend()
+    -- Letting target player know there is a new request
+    net.Start("hta_receiving_request")
+    -- Sending the amount requested
+    net.WriteUInt(requestAmount, 32)
+    -- Sending the key for identification
+    net.WriteString(request.requestId)
+    -- Sending who sent the request
+    net.WriteEntity(reqPlayer)
+    net.Send(targetPlayer)
 end)
 
+-- Handle Accepted Request
 local function HandleRequest(request)
+    local reqPly = player.GetBySteamID(request.requester)
+    local fromPly = player.GetBySteamID(request.from)
+
+    if not reqPly and not fromPly then
+        print("HTA: An Invalid Request was recieved!")
+
+        return
+    elseif not reqPly then
+        fromPly:ChatPrint("HTA: The requester is not available anymore ( He disconnected )!")
+
+        return
+    end
+
+    if fromPly:canAfford(amount) == false then
+        net.Start("hta_cantafford")
+        net.Send(fromPly)
+
+        return
+    end
+
+    table.remove(TRANSFER, request)
+    -- Letting Requester know that the request was accepted
+    net.Start("hta_request_accepted")
+    net.WriteUInt(request.amount, 32)
+    net.WriteString(request.requestId)
+    net.WriteEntity(fromPly)
+    net.Send(reqPly)
+end
+
+-- Handle Declined Request
+local function HandleDecline(request)
+    local reqPly = player.GetBySteamID(request.requester)
+    local fromPly = player.GetBySteamID(request.from)
+
+    if not reqPly and not fromPly then
+        print("HTA: An Invalid Request was recieved!")
+
+        return
+    elseif not reqPly then
+        fromPly:ChatPrint("HTA: The requester is not available anymore ( He disconnected )!")
+
+        return
+    end
+
+    table.remove(TRANSFER, request)
+    -- Letting Requester know that the request was declined
+    net.Start("hta_request_declined")
+    net.WriteUInt(request.amount, 32)
+    net.WriteString(request.requestId)
+    net.WriteEntity(fromPly)
+    net.Send(reqPly)
 end
 
 -- timer.Create("netcooldown", 1, 1, receiveRequestSend)
 -- TODO: ADD TRANSFER REASON?
 hook.Add("PlayerSay", "hedgeChatServerCommands", function(ply, txt, tc)
     if string.StartsWith(txt, "/acceptrequest ") then
-        local id = string.sub(txt, 17)
-        local request = getTransferById(id)
+        local id = string.sub(txt, 16)
+        local _, request = getTransferById(id)
 
         if not request then
             ply:ChatPrint("HTA: Your Id you provided is invalid!")
@@ -210,5 +259,16 @@ hook.Add("PlayerSay", "hedgeChatServerCommands", function(ply, txt, tc)
         end
 
         HandleRequest(request)
+    elseif string.StartsWith(txt, "/declinerequest ") then
+        local id = string.sub(txt, 16)
+        local _, request = getTransferById(id)
+
+        if not request then
+            ply:ChatPrint("HTA: Your Id you provided is invalid!")
+
+            return false
+        end
+
+        HandleDecline(request)
     end
 end)

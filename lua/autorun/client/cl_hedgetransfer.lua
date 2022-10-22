@@ -271,6 +271,20 @@ function hedgeOpenMenu()
     end
 end
 
+net.Receive("hta_request_accepted", function()
+    local reqAmount = net.WriteUInt(request.amount, 32)
+    local reqId = net.WriteString(request.requestId)
+    local fromPly = net.ReadEntity()
+    chat.AddText(Color(255, 114, 114), "HTA:", Color(255, 255, 255), fromPly:Nick() .. " accepted your Request! ( RequestId: " .. reqId .. ", Amount: " .. reqAmount .. ")")
+end)
+
+net.Receive("hta_request_declined", function()
+    local reqAmount = net.WriteUInt(request.amount, 32)
+    local reqId = net.WriteString(request.requestId)
+    local fromPly = net.ReadEntity()
+    chat.AddText(Color(255, 114, 114), "HTA:", Color(255, 255, 255), fromPly:Nick() .. " declined your Request! ( RequestId: " .. reqId .. ", Amount: " .. reqAmount .. ")")
+end)
+
 net.Receive("hta_request_invalid", function()
     local reason = net.ReadString()
 
