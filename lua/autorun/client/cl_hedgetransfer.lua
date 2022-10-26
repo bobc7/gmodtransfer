@@ -220,21 +220,21 @@ function hedgeOpenMenu()
 
         -- TODO: GET THIS WORKING!
         -- Handle when the player clicks the request button
-        -- requestTransfer.DoClick = function ()
-        --     -- Prevent players from sending empty requests or exploiting negative numbers
-        --     if (setAmount:GetValue() <= 0) then
-        --         chat.AddText(Color(255,121,121), "HTA: ", Color(169,43,43), "Value must be greater than 0")
-        --         return
-        --     end
-        --     -- Begin communication with the server
-        --     net.Start("hta_request")
-        --     -- Send selected player
-        --     net.WriteEntity(v)
-        --     -- Send amount to request
-        --     net.WriteUInt(setAmount:GetValue(), 32)
-        --     -- Send all data to the server
-        --     net.SendToServer()
-        -- end
+        requestTransfer.DoClick = function ()
+            -- Prevent players from sending empty requests or exploiting negative numbers
+            if (setAmount:GetValue() <= 0) then
+                chat.AddText(Color(255,121,121), "HTA: ", Color(169,43,43), "Value must be greater than 0")
+                return
+            end
+            -- Begin communication with the server
+            net.Start("hta_request")
+            -- Send selected player
+            net.WriteEntity(v)
+            -- Send amount to request
+            net.WriteUInt(setAmount:GetValue(), 32)
+            -- Send all data to the server
+            net.SendToServer()
+        end
         -- Letting sending player know the transfer was successful
         net.Receive("hta_send_success", function(len)
             local amount = net.ReadUInt(32)
