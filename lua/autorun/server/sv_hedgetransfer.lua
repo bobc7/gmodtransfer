@@ -205,15 +205,15 @@ local function HandleRequest(request)
         return
     end
 
-    if fromPly:canAfford(amount) == false then
+    if fromPly:canAfford(request.amount) == false then
         net.Start("hta_cantafford")
         net.Send(fromPly)
 
         return
     end
 
-    reqPly:addMoney(amount)
-    fromPly:addMoney(-amount)
+    reqPly:addMoney(request.amount)
+    fromPly:addMoney(-request.amount)
     -- Removing Request from the table
     table.remove(TRANSFER, request)
     -- Letting Requester know that the request was accepted
