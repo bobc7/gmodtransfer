@@ -212,6 +212,8 @@ local function HandleRequest(request)
         return
     end
 
+    reqPly:addMoney(amount)
+    fromPly:addMoney(-amount)
     -- Removing Request from the table
     table.remove(TRANSFER, request)
     -- Letting Requester know that the request was accepted
