@@ -182,7 +182,7 @@ net.Receive("hta_request", function(len, reqPlayer)
     -- Letting target player know there is a new request
     net.Start("hta_receiving_request")
     -- Sending the amount requested
-    net.WriteUInt(request.amount, 32)
+    net.WriteUInt(requestAmount, 32)
     -- Sending the key for identification
     net.WriteString(request.requestId)
     -- Sending who sent the request
@@ -205,23 +205,18 @@ local function HandleRequest(request)
         return
     end
 
+    if fromPly:canAfford(amount) == false then
+        net.Start("hta_cantafford")
+        net.Send(fromPly)
 
-    -- TODO: This code is causing issues, "You cannot afford this transfer, when you accept a request that you have enough money for"
-    
-    -- if fromPly:canAfford(requestAmount) == false then
-    --     net.Start("hta_cantafford")
-    --     net.Send(fromPly)
+        return
+    end
 
-    --     return
-    -- end
-
-    fromPly:addMoney(-requestAmount)
-    reqPly:addMoney(requestAmount)
     -- Removing Request from the table
-    table.RemoveByValue(TRANSFER, request)
+    table.remove(TRANSFER, request)
     -- Letting Requester know that the request was accepted
     net.Start("hta_request_accepted")
-    net.WriteUInt(requestAmount, 32)
+    net.WriteUInt(request.amount, 32)
     net.WriteString(request.requestId)
     net.WriteEntity(fromPly)
     net.Send(reqPly)
@@ -243,10 +238,10 @@ local function HandleDecline(request)
     end
 
     -- Removing Request from the table
-    table.RemoveByValue(TRANSFER, request)
+    table.remove(TRANSFER, request)
     -- Letting Requester know that the request was declined
     net.Start("hta_request_declined")
-    net.WriteUInt(requestAmount, 32)
+    net.WriteUInt(request.amount, 32)
     net.WriteString(request.requestId)
     net.WriteEntity(fromPly)
     net.Send(reqPly)
@@ -255,7 +250,7 @@ end
 -- timer.Create("netcooldown", 1, 1, receiveRequestSend)
 -- TODO: ADD TRANSFER REASON?
 hook.Add("PlayerSay", "hedgeChatServerCommands", function(ply, txt, tc)
-    if string.StartWith(txt, "/acceptrequest ") then
+    if string.StartsWith(txt, "/acceptrequest ") then
         local id = string.sub(txt, 16)
         local _, request = getTransferById(id)
 
@@ -265,8 +260,8 @@ hook.Add("PlayerSay", "hedgeChatServerCommands", function(ply, txt, tc)
             return false
         end
 
-        HandleRequest(request) return false
-    elseif string.StartWith(txt, "/declinerequest ") then
+        HandleRequest(request)
+    elseif string.StartsWith(txt, "/declinerequest ") then
         local id = string.sub(txt, 16)
         local _, request = getTransferById(id)
 
@@ -276,6 +271,6 @@ hook.Add("PlayerSay", "hedgeChatServerCommands", function(ply, txt, tc)
             return false
         end
 
-        HandleDecline(request) return false
+        HandleDecline(request)
     end
 end)
