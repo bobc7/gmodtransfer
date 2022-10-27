@@ -13,16 +13,16 @@ function hedgeOpenMenu()
     local Frame = vgui.Create("DFrame")
     Frame:SetBackgroundBlur(HT_MENU_BG_BLUR)
     Frame:SetSize(ScrW() * 800 / 1920, ScrH() * 400 / 1080) -- Scaling
-    Frame:SetTitle(HT_MENU_TITLE)
+    Frame:SetTitle("")
     Frame:SetVisible(true)
     Frame:Center()
     Frame:SetDraggable(true)
     Frame:ShowCloseButton(true)
     Frame:MakePopup()
 
-    -- 'function Frame:Paint( w, h )' works too
-    Frame.Paint = function(s, w, h)
-        draw.RoundedBox(10, 0, 0, w, h, HT_MENU_COLOR) -- Draw a red box instead of the frame
+    Frame.Paint = function(self, w, h)
+        draw.RoundedBox(10, 0, 0, w, h, HT_MENU_COLOR)
+        draw.SimpleText(HT_MENU_TITLE, "HT_SMALL_INFO", 5, 5, HT_MENU_TITLE_COLOR)
     end
 
     local leftPanel = Frame:Add("DPanel")
@@ -59,6 +59,7 @@ function hedgeOpenMenu()
     local welcomeLabel = topRightPanel:Add("DLabel")
     welcomeLabel:SetText("Please Select A Player!")
     welcomeLabel:SetFont("HT_BUTTON_FONT")
+    welcomeLabel:SetColor(HT_SELECT_TEXT)
     welcomeLabel:Dock(FILL)
     welcomeLabel:DockMargin(0, 13, 0, 0)
     welcomeLabel:SizeToContents() -- Fixes text
@@ -66,6 +67,7 @@ function hedgeOpenMenu()
     local welcomeSteamID = rightPanel:Add("DLabel")
     welcomeSteamID:SetText("Player SteamID: No Player Selected")
     welcomeSteamID:SetFont("HT_SMALL_INFO")
+    welcomeSteamID:SetColor(HT_SELECT_TEXT)
     welcomeSteamID:SetContentAlignment(5)
     welcomeSteamID:SizeToContents()
     welcomeSteamID:Dock(FILL)
@@ -74,6 +76,7 @@ function hedgeOpenMenu()
     local whatAmount = rightPanel:Add("DLabel")
     whatAmount:SetText("How much would you like to Send or Request?")
     whatAmount:SetFont("HT_BIG_INFO")
+    whatAmount:SetColor(HT_SELECT_TEXT)
     whatAmount:SetContentAlignment(5)
     whatAmount:SizeToContents()
     whatAmount:Dock(FILL)
@@ -131,6 +134,7 @@ function hedgeOpenMenu()
     local discordButton = scrollList:Add("DButton")
     discordButton:SetText("Support Discord")
     discordButton:SetFont("HT_BUTTON_FONT")
+    discordButton:SetColor(HT_DISCORDBUTTON_TEXT)
     discordButton:Dock(TOP)
     discordButton:DockMargin(30, 0, 30, 5)
 
@@ -141,7 +145,7 @@ function hedgeOpenMenu()
 
     -- gui.OpenURL('https://discord.gg/KfCzCA78ph') -- TODO: CURRENT BUG ([MENU ERROR] attempt to call a nil value)
     discordButton.Paint = function(self, w, h)
-        draw.RoundedBox(10, 0, 0, w, h, HT_ACCENT1)
+        draw.RoundedBox(10, 0, 0, w, h, HT_DISCORDBUTTON_BUTTON)
     end
 
     local creditsButton = scrollList:Add("DButton")
@@ -170,11 +174,18 @@ function hedgeOpenMenu()
         local buttons = scrollList:Add("DButton")
         buttons:SetText(v:Nick()) -- Setting all button names to that players Nick
         buttons:SetFont("HT_BUTTON_FONT")
+        buttons:SetColor(HT_PLAYERBUTTONS_TEXT and HT_PLAYERBUTTONS_TEXT or team.GetColor(v:Team()))
         buttons:Dock(TOP)
         buttons:DockMargin(20, 0, 20, 4)
 
+        local c = HT_PLAYERBUTTONS_BUTTON and HT_PLAYERBUTTONS_BUTTON or team.GetColor(v:Team())
+        local hc = Color(c.r * 1.1, c.g * 1.1, c.b * 1.1)
         buttons.Paint = function(self, w, h)
-            draw.RoundedBox(8, 0, 0, w, h, HT_ACCENT2)
+            if self:IsHovered() then
+                draw.RoundedBox(8, 0, 0, w, h, hc)
+            else
+                draw.RoundedBox(8, 0, 0, w, h, c)
+            end
         end
 
         -- Handles when the player clicks a button to select a player
