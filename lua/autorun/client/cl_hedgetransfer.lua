@@ -166,7 +166,7 @@ function hedgeOpenMenu()
     for k, v in ipairs(players) do
         -- Don't include client
         if v == LocalPlayer() then continue end
-        if v == IsValid() then continue end
+        if !IsValid(v) then continue end
         local buttons = scrollList:Add("DButton")
         buttons:SetText(v:Nick()) -- Setting all button names to that players Nick
         buttons:SetFont("HT_BUTTON_FONT")
@@ -181,7 +181,6 @@ function hedgeOpenMenu()
         buttons.DoClick = function()
             if not v:IsValid() then
                 print("That is not a valid player!")
-
                 return
             end
 
@@ -197,7 +196,6 @@ function hedgeOpenMenu()
                 -- Prevent players from sending empty transfers or exploiting negative numbers
                 if setAmount:GetValue() <= 0 then
                     chat.AddText(Color(255, 121, 121), "HTA: ", Color(169, 43, 43), "Value must be greater than 0")
-
                     return
                 end
 
@@ -210,6 +208,7 @@ function hedgeOpenMenu()
                 -- Send all data to the server
                 net.SendToServer()
             end
+        end
 
         -- Handle when the player clicks the request button
         requestTransfer.DoClick = function ()
@@ -314,7 +313,7 @@ hook.Add("OnPlayerChat", "hedgeChatOpenTransfer", function(ply, text, teamChat, 
         return true
     end
 end)
-end
+
 
 concommand.Add("transfer", hedgeOpenMenu) -- Concommand to trigger the menu
 -- TODO: Figure out the text highlight color on the buttons?
