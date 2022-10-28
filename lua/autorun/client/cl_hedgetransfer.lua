@@ -1,5 +1,7 @@
 AddCSLuaFile("autorun/sh_hedgetransfer_config.lua")
 
+local closeX = Material("gmodtransfer/close.png")
+
 -- Function to create the frame of the menu
 function hedgeOpenMenu()
     -- If no players online don't open menu
@@ -12,17 +14,34 @@ function hedgeOpenMenu()
 
     local Frame = vgui.Create("DFrame")
     Frame:SetBackgroundBlur(HT_MENU_BG_BLUR)
-    Frame:SetSize(ScrW() * 800 / 1920, ScrH() * 400 / 1080) -- Scaling
+    local w = ScrW() * 800 / 1920
+    Frame:SetSize(w, ScrH() * 400 / 1080) -- Scaling
     Frame:SetTitle("")
     Frame:SetVisible(true)
     Frame:Center()
     Frame:SetDraggable(true)
-    Frame:ShowCloseButton(true)
+    Frame:ShowCloseButton(false)
     Frame:MakePopup()
 
     Frame.Paint = function(self, w, h)
         draw.RoundedBox(10, 0, 0, w, h, HT_MENU_COLOR)
-        draw.SimpleText(HT_MENU_TITLE, "HT_SMALL_INFO", 5, 5, HT_MENU_TITLE_COLOR)
+        draw.SimpleText(HT_MENU_TITLE, "HT_BUTTON_FONT", 10, 5, HT_MENU_TITLE_COLOR, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+    end
+
+    local closeButton = Frame:Add("DButton")
+    closeButton:SetText("")
+    closeButton:SetSize(20,20)
+    closeButton:SetPos(w-25,5)
+
+    closeButton.Paint = function(self,w,h)
+        local hover = self:IsHovered() and 255 or 220
+        surface.SetDrawColor(hover, hover, hover, 255)
+	    surface.SetMaterial(closeX)
+	    surface.DrawTexturedRect(0, 0, w, h)
+    end
+
+    closeButton.DoClick = function(self)
+        Frame:Close()
     end
 
     local leftPanel = Frame:Add("DPanel")
