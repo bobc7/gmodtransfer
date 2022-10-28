@@ -1,6 +1,7 @@
 AddCSLuaFile("autorun/sh_hedgetransfer_config.lua")
 
-local closeX = Material("gmodtransfer/close.png")
+local closeMat = Material("gmodtransfer/close.png")
+local infoMat = Material("gmodtransfer/info.png")
 
 -- Function to create the frame of the menu
 function hedgeOpenMenu()
@@ -14,8 +15,9 @@ function hedgeOpenMenu()
 
     local Frame = vgui.Create("DFrame")
     Frame:SetBackgroundBlur(HT_MENU_BG_BLUR)
-    local w = ScrW() * 800 / 1920
-    Frame:SetSize(w, ScrH() * 400 / 1080) -- Scaling
+    local FrameWidth = ScrW() * 800 / 1920
+    local FrameHeight = ScrH() * 400 / 1080
+    Frame:SetSize(FrameWidth, FrameHeight) -- Scaling
     Frame:SetTitle("")
     Frame:SetVisible(true)
     Frame:Center()
@@ -31,12 +33,12 @@ function hedgeOpenMenu()
     local closeButton = Frame:Add("DButton")
     closeButton:SetText("")
     closeButton:SetSize(20,20)
-    closeButton:SetPos(w-25,5)
+    closeButton:SetPos(FrameWidth-25,5)
 
     closeButton.Paint = function(self,w,h)
         local hover = self:IsHovered() and 255 or 220
         surface.SetDrawColor(hover, hover, hover, 255)
-	    surface.SetMaterial(closeX)
+	    surface.SetMaterial(closeMat)
 	    surface.DrawTexturedRect(0, 0, w, h)
     end
 
@@ -149,38 +151,22 @@ function hedgeOpenMenu()
         draw.RoundedBox(0, 0, 0, w, h, HT_DEFAULT_COLOR)
     end
 
-    -- Add Support Buttons
-    local discordButton = scrollList:Add("DButton")
-    discordButton:SetText("Support Discord")
-    discordButton:SetFont("HT_BUTTON_FONT")
-    discordButton:SetColor(HT_DISCORDBUTTON_TEXT)
-    discordButton:Dock(TOP)
-    discordButton:DockMargin(30, 0, 30, 5)
+    -- Development info
 
-    discordButton.DoClick = function()
-        MsgC(Color(255, 255, 255), "\nJoin the discord here! discord.gg/PQGspxpfFe\n")
-        chat.AddText(Color(255, 255, 255), "\nJoin the discord here! discord.gg/PQGspxpfFe\n")
+    local devInfo = Frame:Add("DButton")
+    devInfo:SetText("")
+    devInfo:SetSize(20, 20)
+    devInfo:SetPos(FrameWidth-25, FrameHeight-25)
+
+    devInfo.Paint = function(self,w,h)
+        local hover = self:IsHovered() and 255 or 220
+        surface.SetDrawColor(hover, hover, hover, 255)
+	    surface.SetMaterial(infoMat)
+	    surface.DrawTexturedRect(0, 0, w, h)
     end
 
-    -- gui.OpenURL('https://discord.gg/KfCzCA78ph') -- TODO: CURRENT BUG ([MENU ERROR] attempt to call a nil value)
-    discordButton.Paint = function(self, w, h)
-        draw.RoundedBox(10, 0, 0, w, h, HT_DISCORDBUTTON_BUTTON)
-    end
-
-    local creditsButton = scrollList:Add("DButton")
-    creditsButton:SetText("Addon Credits!")
-    creditsButton:SetFont("HT_BUTTON_FONT")
-    creditsButton:Dock(TOP)
-    creditsButton:DockMargin(30, 0, 30, 8)
-
-    creditsButton.Paint = function(self, w, h)
-        draw.RoundedBox(10, 0, 0, w, h, HT_ACCENT1)
-    end
-
-    creditsButton.DoClick = function()
-        print("\n\n\n\n\n")
-        LocalPlayer():ConCommand("showconsole")
-        MsgC(Color(255, 255, 255), "Hedges Transfer Addon Credits!\n\n", Color(216, 147, 255), "Main Developer: Hedges\n", Color(255, 252, 164), "Steam Link: https://steamcommunity.com/id/Hedgess/\nDiscord Link: discord.gg/PQGspxpfFe\n")
+    devInfo.DoClick = function(self)
+        gui.OpenURL("https://github.com/hedges7/gmodtransfer")
     end
 
     -- Get all players and sort through to make buttons
