@@ -226,6 +226,14 @@ function hedgeOpenMenu()
             end
         end
 
+            requestTransfer.DoClick = function()
+                chat.AddText("The request feature is a work in progress. Please join the discord for updates!")
+
+                return false
+            end
+        end
+
+        -- TODO: GET THIS WORKING!
         -- Handle when the player clicks the request button
         requestTransfer.DoClick = function ()
             -- Prevent players from sending empty requests or exploiting negative numbers
@@ -241,9 +249,7 @@ function hedgeOpenMenu()
             net.WriteUInt(setAmount:GetValue(), 32)
             -- Send all data to the server
             net.SendToServer()
-            return
         end
-
         -- Letting sending player know the transfer was successful
         net.Receive("hta_send_success", function(len)
             local amount = net.ReadUInt(32)
@@ -288,8 +294,8 @@ net.Receive("hta_request_accepted", function()
 end)
 
 net.Receive("hta_request_declined", function()
-    local reqAmount = net.WriteUInt(request.amount, 32)
-    local reqId = net.WriteString(request.requestId)
+    local reqAmount = net.ReadUInt(32)
+    local reqId = net.ReadString()
     local fromPly = net.ReadEntity()
     chat.AddText(Color(255, 114, 114), "HTA:", Color(255, 255, 255), fromPly:Nick() .. " declined your Request! ( RequestId: " .. reqId .. ", Amount: " .. reqAmount .. ")")
 end)
@@ -329,7 +335,6 @@ hook.Add("OnPlayerChat", "hedgeChatOpenTransfer", function(ply, text, teamChat, 
         return true
     end
 end)
-
 
 concommand.Add("transfer", hedgeOpenMenu) -- Concommand to trigger the menu
 -- TODO: Figure out the text highlight color on the buttons?

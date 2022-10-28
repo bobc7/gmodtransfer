@@ -12,5 +12,5 @@ Or if your not a developer but you have an issue/suggestion just make an [issue]
 
 If you have contributed to this project you can claim your role in our [Discord!](https://discord.gg/PQGspxpfFe)
 
-### Dependencies
-DarkRP
+## Dependencies
+-Darkrp
