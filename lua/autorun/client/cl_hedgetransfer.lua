@@ -226,13 +226,6 @@ function hedgeOpenMenu()
             end
         end
 
-            requestTransfer.DoClick = function()
-                chat.AddText("The request feature is a work in progress. Please join the discord for updates!")
-
-                return false
-            end
-        end
-
         -- TODO: GET THIS WORKING!
         -- Handle when the player clicks the request button
         requestTransfer.DoClick = function ()
