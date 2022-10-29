@@ -4,8 +4,9 @@ HT_MENU_BG_BLUR = true
 HT_MENU_TITLE = "Hedges Money Transfer Menu!"
 
 
--- MENU COLORS
+
 if CLIENT then
+    -- MENU COLORS
     HT_MENU_COLOR = Color(35, 35, 35)
     HT_MENU_TITLE_COLOR = Color(200, 200, 200, 255)
     HT_DEFAULT_COLOR = Color(34, 34, 34)
@@ -14,11 +15,8 @@ if CLIENT then
     HT_SELECT_TEXT = HT_MENU_TITLE_COLOR
     HT_BUTTON_TEXT = HT_MENU_TITLE_COLOR
     
-    HT_PLAYERBUTTONS_TEXT = HT_MENU_COLOR -- false uses job color
-    HT_PLAYERBUTTONS_BUTTON = false -- false uses job color
-
-    HT_DISCORDBUTTON_TEXT = HT_MENU_TITLE_COLOR
-    HT_DISCORDBUTTON_BUTTON = Color(119, 133, 204)
+    HT_PLAYERBUTTONS_TEXT = HT_MENU_COLOR -- nil uses job color
+    HT_PLAYERBUTTONS_BUTTON = nil -- nil uses job color
 
     surface.CreateFont("HT_BUTTON_FONT", {
         font = "Roboto",
