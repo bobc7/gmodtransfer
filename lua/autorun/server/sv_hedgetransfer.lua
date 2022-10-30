@@ -252,7 +252,7 @@ end
 -- timer.Create("netcooldown", 1, 1, receiveRequestSend)
 -- TODO: ADD TRANSFER REASON?
 hook.Add("PlayerSay", "hedgeChatServerCommands", function(ply, txt, tc)
-    if string.StartsWith(txt, "/acceptrequest ") then
+    if string.StartWith(txt, "/acceptrequest ") then
         local id = string.sub(txt, 16)
         local _, request = getTransferById(id)
 
@@ -263,7 +263,7 @@ hook.Add("PlayerSay", "hedgeChatServerCommands", function(ply, txt, tc)
         end
 
         HandleRequest(request)
-    elseif string.StartsWith(txt, "/declinerequest ") then
+    elseif string.StartWith(txt, "/declinerequest ") then
         local id = string.sub(txt, 16)
         local _, request = getTransferById(id)
 
