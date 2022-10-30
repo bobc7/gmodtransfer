@@ -1,3 +1,4 @@
+require("reqwest")
 AddCSLuaFile("autorun/sh_hedgetransfer_config.lua")
 -- TODO: ADD MORE FEEDBACK
 -- TODO: ADD SOUNDS
@@ -25,8 +26,8 @@ local TRANSFER = {}
       {
         requestId: [STRING],
         requester: [STEAMID],
-        amount: [NUMBER],
         from: [STEAMID]
+        amount: [NUMBER],
       }
 
 ]]
@@ -53,6 +54,94 @@ local function checkIfUserRequestedIt(reqSteamId, targetSteamId)
     return false
 end
 
+local function sendWebhook(from, to, amount, request)
+    if not HT_TRANSFER_WEBHOOK then return end
+
+    if not request then
+        reqwest({
+            method = "POST",
+            url = HT_TRANSFER_WEBHOOK,
+            timeout = 30,
+            body = util.TableToJSON({
+                embed = {
+                    {
+                        title = "Hedge Transfer Log - Send",
+                        description = "A user send money!",
+                        url = "steam://connect/" .. game.GetIPAddress(),
+                        fields = {
+                            {
+                                name = "From: ",
+                                value = from:Nick(),
+                                inline = true,
+                            },
+                            {
+                                name = "To: ",
+                                value = to:Nick(),
+                                inline = true,
+                            },
+                            {
+                                name = "Amount: ",
+                                value = amount,
+                                inline = false,
+                            },
+                        }
+                    }
+                }
+            }),
+            type = "application/json",
+            headers = {
+                ["User-Agent"] = "Hedge Client", -- This is REQUIRED to dispatch a Discord webhook
+                
+            },
+            success = function(status, body, headers) end,
+            failed = function(err, errExt)
+                print("Error: " .. err .. " (" .. errExt .. ")")
+            end
+        })
+    else
+        reqwest({
+            method = "POST",
+            url = HT_TRANSFER_WEBHOOK,
+            timeout = 30,
+            body = util.TableToJSON({
+                embed = {
+                    {
+                        title = "Hedge Transfer Log - Request",
+                        description = "A user requested money!",
+                        url = "steam://connect/" .. game.GetIPAddress(),
+                        fields = {
+                            {
+                                name = "From: ",
+                                value = from:Nick(),
+                                inline = true,
+                            },
+                            {
+                                name = "To: ",
+                                value = to:Nick(),
+                                inline = true,
+                            },
+                            {
+                                name = "Amount: ",
+                                value = amount,
+                                inline = false,
+                            },
+                        }
+                    }
+                }
+            }),
+            type = "application/json",
+            headers = {
+                ["User-Agent"] = "Hedge Client", -- This is REQUIRED to dispatch a Discord webhook
+                
+            },
+            success = function(status, body, headers) end,
+            failed = function(err, errExt)
+                print("Error: " .. err .. " (" .. errExt .. ")")
+            end
+        })
+    end
+end
+
 local function generateId()
     local template = "xxxxyx"
 
@@ -68,12 +157,12 @@ end
 local delay = 10
 local lastOccurance = -delay
 
-net.Receive("hta_send", function(len, sendingPlayer)
+net.Receive("hta_send", function(len, sendingPly)
     local timeElapsed = CurTime() - lastOccurance
 
     if timeElapsed < delay then
         net.Start("hta_waitcooldown")
-        net.Send(sendingPlayer)
+        net.Send(sendingPly)
 
         return
     end
@@ -88,46 +177,47 @@ net.Receive("hta_send", function(len, sendingPlayer)
     end
 
     -- Receive selected player
-    local selPlayer = net.ReadEntity()
+    local toPly = net.ReadEntity()
     -- Receive amount to transfer
     local amount = net.ReadUInt(32)
 
     -- Blocking values of 0 or lower, due to security concerns.
     if amount <= 0 then
-        print(sendingPlayer:Nick() .. " Tried sending a value of 0 or lower - HTA")
+        print(sendingPly:Nick() .. " Tried sending a value of 0 or lower - HTA")
 
         return
     end
 
     -- Handle transaction
     -- Check if sending player can afford transfer amount
-    if sendingPlayer:canAfford(amount) == false then
+    if sendingPly:canAfford(amount) == false then
         net.Start("hta_cantafford")
-        net.Send(sendingPlayer)
+        net.Send(sendingPly)
 
         return
     end
 
-    sendingPlayer:addMoney(-amount)
-    selPlayer:addMoney(amount)
+    sendingPly:addMoney(-amount)
+    toPly:addMoney(amount)
+    sendWebhook(sendingPly, toPly, requestAmount)
     -- Letting Sending Player know that the transfer was successful
     net.Start("hta_send_success")
     net.WriteUInt(amount, 32)
-    net.Send(sendingPlayer)
+    net.Send(sendingPly)
     -- Letting receiving player know that the transfer was successful
     net.Start("hta_received")
     net.WriteUInt(amount, 32)
-    net.WriteEntity(sendingPlayer)
-    net.Send(selPlayer)
+    net.WriteEntity(sendingPly)
+    net.Send(toPly)
 end)
 
 -- Receive transfer request
-net.Receive("hta_request", function(len, reqPlayer)
+net.Receive("hta_request", function(len, reqPly)
     local timeElapsed = CurTime() - lastOccurance
 
     if timeElapsed < delay then
         net.Start("hta_waitcooldown")
-        net.Send(reqPlayer)
+        net.Send(reqPly)
 
         return
     end
@@ -142,43 +232,44 @@ net.Receive("hta_request", function(len, reqPlayer)
     end
 
     -- Player who is getting the request
-    local targetPlayer = net.ReadEntity()
+    local targetPly = net.ReadEntity()
 
-    if not targetPlayer or not targetPlayer:IsPlayer() then
+    if not targetPly or not targetPly:IsPlayer() then
         net.Start("hta_request_invalid")
         net.WriteString("The Player you choosen is either vanished or is disconnected")
-        net.Send(reqPlayer)
+        net.Send(reqPly)
     end
 
     -- Amount being requested
     local requestAmount = net.ReadUInt(32)
 
-    if checkIfUserRequestedIt(reqPlayer:SteamID(), targetPlayer:SteamID64()) then
+    if checkIfUserRequestedIt(reqPly:SteamID(), targetPly:SteamID64()) then
         net.Start("hta_request_invalid")
         net.WriteString("You already requested Money from him! Please wait!")
-        net.Send(reqPlayer)
+        net.Send(reqPly)
     end
 
-    if targetPlayer:canAfford(requestAmount) == false then
+    if targetPly:canAfford(requestAmount) == false then
         net.Start("hta_reqcantafford")
-        net.Send(reqPlayer)
+        net.Send(reqPly)
 
         return
     end
 
     local request = {
         requestId = generateId(),
-        requester = reqPlayer:SteamID(),
+        requester = reqPly:SteamID(),
         amount = requestAmount,
-        from = targetPlayer:SteamID()
+        from = targetPly:SteamID()
     }
 
+    sendWebhook(targetPly, reqPly, requestAmount, true)
     -- Adding Request Object
     table.insert(TRANSFER, request)
     -- Letting requesting player know that the request was received
     net.Start("hta_request_received")
-    net.WriteEntity(targetPlayer)
-    net.Send(reqPlayer)
+    net.WriteEntity(targetPly)
+    net.Send(reqPly)
     -- Letting target player know there is a new request
     net.Start("hta_receiving_request")
     -- Sending the amount requested
@@ -186,8 +277,8 @@ net.Receive("hta_request", function(len, reqPlayer)
     -- Sending the key for identification
     net.WriteString(request.requestId)
     -- Sending who sent the request
-    net.WriteEntity(reqPlayer)
-    net.Send(targetPlayer)
+    net.WriteEntity(reqPly)
+    net.Send(targetPly)
 end)
 
 -- Handle Accepted Request
@@ -204,6 +295,8 @@ local function HandleRequest(request)
 
         return
     end
+
+    sendWebhook(fromPly, reqPly, request.amount)
 
     if fromPly:canAfford(request.amount) == false then
         net.Start("hta_cantafford")
@@ -249,11 +342,18 @@ local function HandleDecline(request)
     net.Send(reqPly)
 end
 
--- timer.Create("netcooldown", 1, 1, receiveRequestSend)
--- TODO: ADD TRANSFER REASON?
-hook.Add("PlayerSay", "hedgeChatServerCommands", function(ply, txt, tc)
-    if string.StartWith(txt, "/acceptrequest ") then
-        local id = string.sub(txt, 16)
+-- All usable prefixes for commands.
+local prefixs = {
+    ["!"] = true,
+    ["/"] = true,
+}
+
+-- Commands
+local commands = {
+    ["acceptrequest"] = function(ply, ...)
+        local args = {...}
+
+        local id = args[2]
         local _, request = getTransferById(id)
 
         if not request then
@@ -263,8 +363,11 @@ hook.Add("PlayerSay", "hedgeChatServerCommands", function(ply, txt, tc)
         end
 
         HandleRequest(request)
-    elseif string.StartWith(txt, "/declinerequest ") then
-        local id = string.sub(txt, 16)
+    end,
+    ["declinerequest"] = function(ply, ...)
+        local args = {...}
+
+        local id = args[2]
         local _, request = getTransferById(id)
 
         if not request then
@@ -274,5 +377,16 @@ hook.Add("PlayerSay", "hedgeChatServerCommands", function(ply, txt, tc)
         end
 
         HandleDecline(request)
+    end
+}
+
+hook.Add("PlayerSay", "commandsblah", function(ply, text)
+    if IsValid(ply) and prefixs[string.sub(text, 1, 1)] then
+        local split = string.Explode(" ", string.lower(string.sub(text, 2)))
+        local cmd = commands[split[1]]
+
+        if cmd then
+            cmd(ply, unpack(split, 2))
+        end
     end
 end)

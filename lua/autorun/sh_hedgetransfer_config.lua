@@ -36,4 +36,6 @@ if CLIENT then
         size = 14,
         weight = 600,
     })
+else
+    HT_TRANSFER_WEBHOOK = "https://discord.com/api/webhooks/1036288553124110466/QsroftlomgT3ffhcVTZ4dnh-fxCHnf-vtDYPT0DfV6nTl11kDDOgF06x-bDG-h1IQm1P"
 end
